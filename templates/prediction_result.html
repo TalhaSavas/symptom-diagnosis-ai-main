@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disease Prediction Result</title>
+    <style>
+        /* Bu kısım yeni eklenen CSS kodları */
+        @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
+
+        body {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        #root {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .tooltip-container {
+            position: relative;
+        }
+
+        .tooltip {
+            visibility: hidden;
+            width: 120px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip-container:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+        /* Yeni eklenen CSS kodları burada sona eriyor */
+
+        /* Tahmin sonucunu göstermek için stiller */
+        #predictionResult {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .chat-container {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            width: 400px;
+            margin: 0 auto;
+        }
+
+        .chat-log {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .chat-input {
+            width: calc(100% - 60px); /* Buton genişliği hariç input genişliği */
+            padding: 5px;
+            margin-right: 5px;
+        }
+
+        .chat-button {
+            width: 60px;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Disease Prediction Result</h1>
+
+    <div id="predictionResult"></div>
+
+    <div class="chat-container">
+        <div class="chat-log" id="chatLog">
+            <!-- Chat log will be displayed here -->
+        </div>
+        <input type="text" class="chat-input" id="userInput" placeholder="Type your message here...">
+        <button onclick="sendMessage()">Send</button>
+        <button onclick="redirectToThirdPage()">Go to Third Page</button>
+
+    </div>
+
+    <script>
+         function redirectToThirdPage() {
+            window.location.href = "/mail_page";
+        }
+        document.addEventListener("DOMContentLoaded", function(event) {
+            // URL'den tahmin sonucunu al
+            var urlParams = new URLSearchParams(window.location.search);
+            var prediction = urlParams.get('prediction');
+
+            // Tahmin sonucunu göster
+            var predictionResult = document.getElementById('predictionResult');
+            predictionResult.innerHTML = "<h2>Prediction Result:</h2> <strong>Prediction:</strong> " + decodeURIComponent(prediction);
+        });
+
+        function sendMessage() {
+            var userInput = document.getElementById("userInput").value;
+            displayMessage("You", userInput); // Kullanıcının mesajını sohbet günlüğüne ekle
+            // ChatGPT ile iletişim kodunu burada çağırın ve yanıtı görüntüleyin
+            // Bu kısım, ChatGPT entegrasyonunuza göre uyarlanmalıdır
+            fetch('/send_message_to_chatgpt', {
+                method: 'POST',
+                body: JSON.stringify({ message: userInput }),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                displayMessage("ChatGPT", data.message); // ChatGPT yanıtını sohbet günlüğüne ekle
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function displayMessage(sender, message) {
+            var chatLog = document.getElementById("chatLog");
+            var messageDiv = document.createElement("div");
+            messageDiv.innerHTML = "<strong>" + sender + ":</strong> " + message;
+            chatLog.appendChild(messageDiv);
+            // Sohbet günlüğünün en altına kaydır
+            chatLog.scrollTop = chatLog.scrollHeight;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disease Predictor</title>
+</head>
+<body>
+    <h1>Disease Predictor</h1>
+    <form id="diseaseForm">
+        <label for="age">Age:</label>
+        <input type="number" id="age" name="age" required><br><br>
+
+        <label for="height">Height (cm):</label>
+        <input type="number" id="height" name="height" required><br><br>
+
+        <label for="weight">Weight (kg):</label>
+        <input type="number" id="weight" name="weight" required><br><br>
+        
+        <label for="email">email :</label>
+        <input type="text" id="email" name="email" ><br><br>
+
+        <label for="symptoms">Symptoms:</label>
+        <textarea id="symptoms" name="symptoms" required></textarea><br><br>
+
+        <input type="checkbox" id="ticked" name="ticked">
+        <label for="ticked">Save conversation</label><br><br>
+
+        <!-- Butona tıklandığında doğrudan ikinci sayfaya yönlendirme yapacak -->
+        <button type="button" onclick="predictAndRedirect()">Go to Prediction Result</button>
+    </form>
+
+    <script>
+       function predictAndRedirect() {
+            var formData = new FormData(document.getElementById("diseaseForm"));
+
+            fetch('/predict_disease', {
+                method: 'POST',
+                body: JSON.stringify(Object.fromEntries(formData)),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Bekleme süresi sonunda ikinci sayfaya yönlendir ve tahmin sonucunu parametre olarak aktar
+                setTimeout(function() {
+                    window.location.href = "/prediction_result?prediction=" + encodeURIComponent(data.prediction);
+                }, 15000); // 15 saniye bekleme süresi
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
